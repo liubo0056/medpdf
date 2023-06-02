@@ -107,7 +107,7 @@ liubo/789456
 
 
 
-### 模型添加到后台
+### 模型添加到后台(ModelAdmin)
 
 实现使用admin后台进行增删改查
 
@@ -316,3 +316,48 @@ class CustomerAdminForm(forms.ModelForm):
 # common/admin.py
 form = CustomerAdminForm
 ```
+
+### 重写保存方法
+
+做一些业务逻辑处理
+
+```py
+    # forms.py
+    def save(self,commit=False):
+        obj = super().save(commit=commit)
+        if obj.age <=5:
+            obj.age = 18
+            obj.save()
+        return obj
+```
+
+### 用户后台管理（UserAdmin）
+
+```python
+from django.contrib.auth.admin import UserAdmin
+@admin.register(CustomUser)
+class MyUserAdmin(UserAdmin):
+    """用户基础信息管理"""
+    # 列表中显示的内容
+    list_display = ('username', 'nickname', 'is_active', 'is_staff','is_superuser')
+    list_filter = ('is_staff', 'is_superuser', 'is_active', 'groups')
+    search_fields = ('username', 'nickname')
+    # 新增用户的表单
+    add_fieldsets = UserAdmin.add_fieldsets + (
+        (None, {'fields': ('nickname',)}),
+    )
+    # 修改用户的表单
+    fieldsets = UserAdmin.fieldsets + (
+        (None, {'fields': ('nickname','avatar',)}),
+    )
+    actions = ['disable_user','enable_user']
+
+    def disable_user(self,request,queryset):
+        queryset.update(is_active=False)
+    disable_user.short_description = "批量禁用用户"
+
+    def enable_user(self,request,queryset):
+        queryset.update(is_active=True)
+    enable_user.short_description = "批量启用用户"
+```
+
