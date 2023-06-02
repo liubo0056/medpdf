@@ -1,5 +1,6 @@
 from django.contrib import admin
 
+from .forms import CustomerAdminForm
 from .models import Customer,CustomUser
 # admin.site.register(Customer)
 
@@ -22,7 +23,14 @@ class CustomerAdmin(admin.ModelAdmin):
     search_fields = ("name","user__nickname")
     # 需要编辑的字段
     fields = ('name','age','phonenumber','qq',)
+    # 表单验证（age字段）
+    form = CustomerAdminForm
     # 字段脱敏处理
     def format_name(self,obj):
         return obj.name[:1] + "***"
     format_name.short_description = "用户名"
+
+
+
+
+
