@@ -15,6 +15,8 @@ class Customer(models.Model):
     user = models.OneToOneField(CustomUser,related_name='customer',on_delete=models.CASCADE,null=True, blank=True)
     # 客户名称
     name = models.CharField(verbose_name='姓名',max_length=200)
+    # 年龄
+    age = models.IntegerField(verbose_name='年龄',null=True, blank=True)
     # 性别选项
     GENDER_CHOICES = (
         ('male', '男性'),
@@ -27,7 +29,7 @@ class Customer(models.Model):
     phonenumber = models.CharField(verbose_name='电话',max_length=200)
 
     # qq号码
-    QQ = models.CharField(verbose_name='QQ号',max_length=200)
+    qq = models.CharField(verbose_name='QQ号',max_length=200)
     # 填写verbose_name参数后后台会用这个字段替换name,gender这些
     # 设置后后台会显示对象的名字，而不是原始的object(1,2,2)
     class Meta:

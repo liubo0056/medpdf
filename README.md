@@ -284,5 +284,15 @@ class CustomerAdmin(admin.ModelAdmin):
     format_name.short_description = "用户名"
 ```
 
+### 限制可编辑字段
+
+是否允许编辑字段
+
+```python
+editable=False
+```
+
+fields/exclude 需要编辑/不需要编辑的字段列表(#/common/admin.py)
+
 
 
