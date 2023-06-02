@@ -9,8 +9,10 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
-
+import os
 from pathlib import Path
+
+from django.template.context_processors import media
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -38,8 +40,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # 注册app
+    # 富文本编辑器
+    'ckeditor',
+    'ckeditor_uploader',
+    # 公共模块
     'common.apps.CommonConfig',
+    # 图书模块
+    'book.apps.BookConfig'
 ]
 
 MIDDLEWARE = [
@@ -128,6 +135,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+# 富文本编辑器文件上传位置
+CKEDITOR_UPLOAD_PATH = "uploads/"
+
+MEDIA_URL = 'http://localhost:8000/'
+MEDIA_ROOT = os.path.join(BASE_DIR,'media')
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field

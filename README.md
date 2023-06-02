@@ -256,6 +256,7 @@ AUTH_USER_MODEL = 'common.CustomUser'
 ### 优化 脱敏 查询 
 
 ```py
+# common/admin.py
 from django.contrib import admin
 from .models import Customer,CustomUser
 # admin.site.register(Customer)
@@ -289,6 +290,7 @@ class CustomerAdmin(admin.ModelAdmin):
 是否允许编辑字段
 
 ```python
+# models.py
 editable=False
 ```
 
@@ -334,6 +336,7 @@ form = CustomerAdminForm
 ### 用户后台管理（UserAdmin）
 
 ```python
+# common/admin.py
 from django.contrib.auth.admin import UserAdmin
 @admin.register(CustomUser)
 class MyUserAdmin(UserAdmin):
@@ -360,4 +363,37 @@ class MyUserAdmin(UserAdmin):
         queryset.update(is_active=True)
     enable_user.short_description = "批量启用用户"
 ```
+
+### 富文本功能实现
+
+https://github.com/django-ckeditor/django-ckeditor
+
+```bash
+pip install django-ckeditor
+Add "ckeditor" to your INSTALLED_APPS setting.
+Run the collectstatic management command: $ ./manage.py collectstatic. 
+```
+
+> 直接运行python manage.py会有代码提示
+
+```py
+# settings.py
+INSTALLED_APPS = [
+    # 富文本编辑器
+    'ckeditor',
+    'ckeditor_uploader',
+]
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+# 富文本编辑器文件上传位置
+CKEDITOR_UPLOAD_PATH = "uploads/"
+MEDIA_URL = 'http://localhost:8080/'
+MEDIA_ROOT = os.path.join(BASE_DIR,'media')
+# models.py
+detail_page_content = RichTextField(verbose_name="详情页富文本内容",null=True, blank=True)
+```
+
+
+
+
 
