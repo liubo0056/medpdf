@@ -46,14 +46,14 @@ INSTALLED_APPS = [
     # 公共模块
     'common.apps.CommonConfig',
     # 图书模块
-    'book.apps.BookConfig'
+    'books.apps.BooksConfig',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -139,7 +139,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 # 富文本编辑器文件上传位置
 CKEDITOR_UPLOAD_PATH = "uploads/"
 
-MEDIA_URL = 'http://localhost:8000/'
+MEDIA_URL = 'media/'
 MEDIA_ROOT = os.path.join(BASE_DIR,'media')
 
 

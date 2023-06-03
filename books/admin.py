@@ -1,8 +1,6 @@
 from django.contrib import admin, messages
 
-from book.models import Book
-
-
+from .models import Book
 @admin.register(Book)
 class BookAdmin(admin.ModelAdmin):
     """图书基础信息"""

@@ -393,7 +393,39 @@ MEDIA_ROOT = os.path.join(BASE_DIR,'media')
 detail_page_content = RichTextField(verbose_name="详情页富文本内容",null=True, blank=True)
 ```
 
+### 图片上传到media文件夹
 
+### 登录页面测试
 
+```javascript
+    <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script>
+        window.onload = () => {
+            document.querySelector('#loginBtn').onclick = () => {
+                let username = document.querySelector('#username').value
+                let password = document.querySelector('#password').value
+                $.post('/api/common/signin',
+                    {
+                        username: username,
+                        password: password
+                    }
+                )
+            }
+        }
+    </script>
+```
 
+```html
+<body>
+    <main>
+        <div>用户登录</div>
+        <div>
+            <label for="username"></label><input type="text" placeholder="请输入用户名" id="username">
+            <label for="password"></label><input type="password" placeholder="请输入密码" id="password">
+            <button id="loginBtn">登录</button>
+        </div>
+        <a href="#">还没有账号？请先注册</a>
+    </main>
+</body>
+```
 
