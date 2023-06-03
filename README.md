@@ -393,7 +393,18 @@ MEDIA_ROOT = os.path.join(BASE_DIR,'media')
 detail_page_content = RichTextField(verbose_name="详情页富文本内容",null=True, blank=True)
 ```
 
-### 图片上传到media文件夹
+### media文件夹路由设置
+
+```py
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('api/common/', include("common.urls")),
+    path('api/books/', include("books.urls")),
+    url(r'^media/(?P<path>.*)', serve, {"document_root":settings.MEDIA_ROOT}),
+    # 富文本相关配置
+    path('ckeditor/', include('ckeditor_uploader.urls')),
+] + static("/", document_root="./z_dist")
+```
 
 ### 登录页面测试
 
@@ -429,3 +440,41 @@ detail_page_content = RichTextField(verbose_name="详情页富文本内容",null
 </body>
 ```
 
+### 分页功能
+
+得到了queryset怎么实现分页功能呢
+
+要实现分页功能，可以使用Django自带的Paginator类。首先需要引入Paginator：
+
+```python
+from django.core.paginator import Paginator
+```
+
+然后在`listbooks`函数中，将`queryset`传给`Paginator`对象：
+
+```python
+paginator = Paginator(queryset, 10)  # 每页显示10条数据
+```
+
+接下来，获取当前页数和总页数：
+
+```python
+page = request.GET.get('page')
+books_list = paginator.get_page(page)
+total_pages = paginator.num_pages
+```
+
+这里使用`request.GET`获取GET请求参数中的`page`值，表示当前所在页数，默认为第1页。然后调用`get_page`方法返回一个包含指定页数数据的Page对象，此时`Books_list`就是一个可迭代的Page对象，其中包含了当前页面的所有数据。
+
+最后，在返回JsonResponse之前，添加如下代码即可将分页信息（当前页码、总页数等）一并返回：
+
+```python
+result = {
+    'books': list(books_list),
+    'page': books_list.number,
+    'total_pages': total_pages,
+}
+return JsonResponse(result, safe=False)
+```
+
+这样就完成了Django中基本的分页功能。
