@@ -14,7 +14,11 @@ import requests,pprint
 # pprint.pprint(response.json())
 
 """图书查血测试"""
-res = requests.get('http://localhost/api/books/books')
+url = "http://localhost/api/books/books"
+payload = {
+    'title':'图解'
+}
+res = requests.get(url,params=payload)
 res_data = res.content.decode('utf-8')
 books = json.loads(res_data)
 print(books)

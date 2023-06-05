@@ -442,39 +442,123 @@ urlpatterns = [
 
 ### 分页功能
 
-得到了queryset怎么实现分页功能呢
-
-要实现分页功能，可以使用Django自带的Paginator类。首先需要引入Paginator：
-
 ```python
-from django.core.paginator import Paginator
+from django.http import JsonResponse # 导入JsonResponse模块，用于返回JSON格式的响应
+from django.core.paginator import Paginator # 导入Paginator模块，用于分页
+from .models import Book # 导入Book模型
+
+def listbooks(request): 
+    title_query = request.GET.get('title', '') # 获取GET请求中的'title'参数
+    img_query = request.GET.get('main_img', '') # 获取GET请求中的'main_img'参数
+    date_query = request.GET.get('upload_date', '') # 获取GET请求中的'upload_date'参数
+
+    books_qs = Book.objects.filter( # 通过filter方法过滤数据
+        title__icontains=title_query, # 根据title_query进行模糊查询
+        main_img__icontains=img_query, # 根据img_query进行模糊查询
+        upload_date__icontains=date_query # 根据date_query进行模糊查询
+    )
+    pagesize = request.GET.get('pagesize') # 获取GET请求中的'pagesize'参数
+
+    paginator = Paginator(books_qs, pagesize) # 创建Paginator对象，每页显示pagesize条数据
+
+    page_number = request.GET.get('pagenum') # 获取GET请求中的'pagenum'参数
+    page_obj = paginator.get_page(page_number) # 获取指定页数的Page对象
+
+    books_list = list(page_obj.object_list.values()) # 将Page对象转换为可迭代的列表
+
+    return JsonResponse({ # 返回JSON格式的响应
+        'books': books_list, # 列表数据
+        'has_previous': page_obj.has_previous(), # 是否有前一页
+        'has_next': page_obj.has_next(), # 是否有后一页
+        'previous_page_number': page_obj.previous_page_number() if page_obj.has_previous() else None, # 前一页页码
+        'next_page_number': page_obj.next_page_number() if page_obj.has_next() else None, # 后一页页码
+        'total_pages': paginator.num_pages, # 总页数
+        'current_page_number': page_obj.number, # 当前页码
+    }, safe=False) # 设置safe为False，使得可以返回非字典类型的数据
 ```
 
-然后在`listbooks`函数中，将`queryset`传给`Paginator`对象：
+### requests构建请求
 
 ```python
-paginator = Paginator(queryset, 10)  # 每页显示10条数据
+import requests, pprint
+payload = { "pagenum": 1,"pagesize":5}
+response = requests.get(
+    "http://127.0.0.1/api/books/books",
+    params=payload
+)
+pprint.pprint(response.json())
 ```
 
-接下来，获取当前页数和总页数：
+### 重定向实现
 
-```python
-page = request.GET.get('page')
-books_list = paginator.get_page(page)
-total_pages = paginator.num_pages
+```javascript
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.0/jquery.min.js"></script>
+    <script>
+        window.onload = () => {
+            document.querySelector('#loginBtn').onclick = () => {
+                let username = document.querySelector('#username').value
+                let password = document.querySelector('#password').value
+                $.ajax({
+                    url: '/api/common/signin',
+                    method: 'POST',
+                    data: {
+                        username: username,
+                        password: password
+                    },
+                    success: function (data, status) {
+                        // 当服务器成功响应请求时调用此函数
+                        // 把响应数据data(object)序列化显示
+                        // const json = JSON.stringify(data)
+                        console.log('响应数据: ' + data.ret);
+                        console.log('状态: ' + status);
+                        //如果登录成功，重定向至另外一个页面
+                        if (data.ret === 0) {
+                            location.href = './admin/'
+                        }
+                        else { alert('登录失败' + data.msg) }
+                    },
+                    error: function (xhr, status, error) {
+                        // 当请求发生错误时调用此函数
+                        console.log('错误: ' + error);
+                    }
+                })
+            }
+        }
+    </script>
 ```
 
-这里使用`request.GET`获取GET请求参数中的`page`值，表示当前所在页数，默认为第1页。然后调用`get_page`方法返回一个包含指定页数数据的Page对象，此时`Books_list`就是一个可迭代的Page对象，其中包含了当前页面的所有数据。
+### grid实现整体布局
 
-最后，在返回JsonResponse之前，添加如下代码即可将分页信息（当前页码、总页数等）一并返回：
+```html
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理页面</title>
+    <style>
+        body {
+            /* 高度占满整个屏幕 */
+            height: 100vh;
+            margin: 0;
+            /* 指定网格布局 */
+            display: grid;
+            /* 指定行的分布 */
+            grid-template-rows: auto 1fr auto;
+            grid-template-columns: 20rem 1fr;
+        }
 
-```python
-result = {
-    'books': list(books_list),
-    'page': books_list.number,
-    'total_pages': total_pages,
-}
-return JsonResponse(result, safe=False)
+        div {
+            border: 1px solid red;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav-logo">管理员操作</div>
+    <div>导航栏</div>
+    <div>操作菜单</div>
+    <div>正文</div>
+    <div></div>
+    <div>页脚</div>
+</body>
 ```
 
-这样就完成了Django中基本的分页功能。
